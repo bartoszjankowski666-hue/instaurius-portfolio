@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>INSTAURIUS | Revenue Intelligence</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,sans-serif;color:#172c2a;background:#f3f5f2}*{box-sizing:border-box}body{margin:0}main{max-width:920px;margin:auto;padding:32px 20px 56px}header{border-bottom:1px solid #cbd5cf;padding-bottom:20px}small,.muted{color:#52665f}h1{font-size:clamp(2rem,6vw,3rem);line-height:1.1;margin:12px 0}h2{font-size:1.25rem}section{background:white;border:1px solid #d6dfd9;border-radius:16px;padding:22px;margin-top:20px}p{line-height:1.6}label{display:block;font-weight:600;margin:14px 0 5px}input{width:100%;padding:12px;border:1px solid #9aaba3;border-radius:8px;font:inherit}button{font:inherit;padding:12px 18px;border:1px solid #335b4b;border-radius:8px;background:#335b4b;color:white;cursor:pointer;margin-top:16px}button:focus-visible,input:focus-visible{outline:3px solid #ba8b38;outline-offset:3px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}.metric{background:#edf3ef;border-radius:10px;padding:16px}.metric strong{display:block;font-size:1.8rem;margin-top:8px;overflow-wrap:anywhere}.warning{color:#85411e}ol{padding-left:22px;line-height:1.8}a{color:#235c48}
+</style></head><body><main>
+<header><small>INSTAURIUS / COMMERCIAL PROCESS INTELLIGENCE</small><h1>Find revenue leakage before adding software.</h1><p>A transparent, interactive model for prioritising inquiry handling and follow-up improvements.</p><small>Independent portfolio demonstration · synthetic scenario · no measured client outcomes</small></header>
+<section><h2>01 / Model your baseline</h2><form id="model"><div class="grid">
+<div><label for="inquiries">Monthly inquiries</label><input id="inquiries" type="number" required min="0" max="1000000" step="1" value="100"></div>
+<div><label for="lost">Lost to follow-up gaps (%)</label><input id="lost" type="number" required min="0" max="100" step="any" value="20"></div>
+<div><label for="recovery">Recoverable share (%)</label><input id="recovery" type="number" required min="0" max="100" step="any" value="50"></div>
+<div><label for="conversion">Recovered inquiry conversion (%)</label><input id="conversion" type="number" required min="0" max="100" step="any" value="15"></div>
+<div><label for="margin">Contribution per extra sale (€)</label><input id="margin" type="number" required min="0" max="10000000" step="any" value="1500"></div>
+<div><label for="cost">Additional monthly operating cost (€)</label><input id="cost" type="number" required min="0" max="10000000" step="any" value="0"></div>
+</div><button type="submit">Calculate scenario</button></form><p id="error" role="alert" class="warning" hidden>Enter valid non-negative values within the stated limits.</p></section>
+<section aria-live="polite"><h2>02 / Estimated monthly impact</h2><div class="grid"><div class="metric">Recovered inquiries<strong id="recovered">—</strong></div><div class="metric">Additional expected sales<strong id="sales">—</strong></div><div class="metric">Net incremental contribution<strong id="profit">—</strong></div></div><p class="muted">Recovered inquiries = inquiries × loss share × recoverable share. Expected sales = recovered inquiries × conversion. Net incremental contribution = expected sales × contribution per sale − additional operating cost. Fractional sales represent expected values, not guaranteed orders. Excludes initial setup cost, taxes and uncertainty; use measured client data before making decisions.</p></section>
+<section><h2>03 / From model to measurable pilot</h2><ol><li>Map the existing inquiry-to-order workflow and identify one verified bottleneck.</li><li>Measure response time, overdue follow-ups and conversion on a defined baseline cohort.</li><li>Test one bounded improvement using the existing CRM and approved integrations.</li><li>Compare matched cohorts, report costs and limitations, and decide whether to expand.</li></ol><p>Deliverables: process map, evidence ledger, prioritised intervention, measurement plan and decision report. No claim of previous commercial deployments.</p></section>
+<section><h2>04 / Research and implementation approach</h2><p>Compare existing tools and workflows before recommending new software. Separate vendor claims, verified features, assumptions and observed results. Public starting points: <a href="https://www.hubspot.com/products/sales">HubSpot</a>, <a href="https://www.pipedrive.com/en/pricing">Pipedrive</a>, <a href="https://www.gohighlevel.com/pricing">HighLevel</a>, <a href="https://n8n.io/pricing/">n8n</a>. Pricing and suitability must be rechecked for each client.</p><p class="muted">This standalone demo runs locally without accounts, external scripts, analytics or data transmission.</p></section>
+</main><script>
+"use strict";
+const ids=["inquiries","lost","recovery","conversion","margin","cost"];
+const limits=[1000000,100,100,100,10000000,10000000];
+function evaluate(v){
+ if(v.length!==6||v.some((n,i)=>!Number.isFinite(n)||n<0||n>limits[i])||!Number.isInteger(v[0]))return null;
+ const recovered=v[0]*v[1]/100*v[2]/100;
+ const sales=recovered*v[3]/100;
+ return {recovered,sales,profit:sales*v[4]-v[5]};
+}
+const num=new Intl.NumberFormat("en-GB",{maximumFractionDigits:2});
+const eur=new Intl.NumberFormat("en-IE",{style:"currency",currency:"EUR",maximumFractionDigits:2});
+function render(){
+ const values=ids.map(id=>document.getElementById(id).valueAsNumber);
+ const result=evaluate(values);
+ document.getElementById("error").hidden=Boolean(result);
+ document.getElementById("recovered").textContent=result?num.format(result.recovered):"—";
+ document.getElementById("sales").textContent=result?num.format(result.sales):"—";
+ document.getElementById("profit").textContent=result?eur.format(result.profit):"—";
+}
+document.getElementById("model").addEventListener("submit",e=>{e.preventDefault();render()});
+document.getElementById("model").addEventListener("input",render);
+render();
+</script></body></html>
